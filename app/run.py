@@ -10,6 +10,7 @@ from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
+import numpy as np
 
 
 app = Flask(__name__)
@@ -43,6 +44,24 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
 
+    aid_names = ["medical_help", "medical_products", "search_and_rescue", "security", "military", "child_alone", "water", "food", "shelter", "clothing", "money", "missing_people", "refugees", "death", "other_aid"]
+    aid_counts = []
+    for name in aid_names:
+        aid_counts.append(df[(df[name] == 1)][name].count())
+    aid_counts = np.array(aid_counts)
+
+    infrastructure_names = ["transport", "buildings", "electricity", "tools", "hospitals", "shops", "aid_centers", "other_infrastructure"]
+    infrastructure_counts = []
+    for name in infrastructure_names:
+        infrastructure_counts.append(df[(df[name] == 1)][name].count())
+    infrastructure_counts = np.array(infrastructure_counts)
+
+    weather_names = ["floods", "storm", "fire", "earthquake", "cold", "other_weather"]
+    weather_counts = []
+    for name in weather_names:
+        weather_counts.append(df[(df[name] == 1)][name].count())
+    weather_counts = np.array(weather_counts)
+
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -63,11 +82,66 @@ def index():
                     'title': "Genre"
                 }
             }
-        }
+        },
+        {
+            'data': [
+                Bar(
+                    x=aid_names,
+                    y=aid_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Aid-Related Messages by Categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Category"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=infrastructure_names,
+                    y=infrastructure_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Infrastructure-Related Messages by Categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Category"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=weather_names,
+                    y=weather_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Weather-Related Messages by Categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Category"
+                }
+            }
+        },
     ]
 
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
+
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
 
     # render web page with plotly graphs
