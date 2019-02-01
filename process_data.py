@@ -70,7 +70,7 @@ def save_data(df, database_filename):
     database_filename (string): a name of the sql database
 
     Returns:
-    None  
+    None
     """
     # Save the df to the SQL db
     db_path_name = 'sqlite:///' + database_filename
@@ -79,6 +79,18 @@ def save_data(df, database_filename):
 
 
 def main():
+    """
+    Takes file paths of messaves and categories csv files and the file path of
+    a sql database to be saved
+
+    Parameters:
+    message_filepath (string): a file path of a messages csv file
+    categories_filepath (string): a file path of a categories csv file
+    database_filepath (string): a file path of a database
+
+    Returns:
+    None, but saves a sql db file at a specified path
+    """
     if len(sys.argv) == 4:
 
         messages_filepath, categories_filepath, database_filepath = sys.argv[1:]
